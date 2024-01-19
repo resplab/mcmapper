@@ -226,3 +226,37 @@ solve_beta <- function(target=c(m=0.5,c=0.75), init=NULL)
 
 
 
+
+#'@export
+solve <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnormal", "probitnormal"), init=NULL)
+{
+  if(!is.vector(target) | length(target)!=2)
+  {
+    stop("Error: target should be a vector oftwo elements (m, c)")
+  }
+
+  if(is.null(names(target)))
+  {
+    m <- target[1]
+    c <- target[2]
+  }
+  else
+  {
+    m <- target['m']
+    c <- target['c']
+  }
+
+  if(m<=0 | m>=1 | c<=0.5 | c>=1)
+  {
+    stop("Error: inadmissible value for m and/or c.")
+  }
+
+  switch(
+    type,
+    "beta"=solve_beta(c(m,c)),
+    "logitnormal"=solve_logitnormal(c(m,c)),
+    "probitnormal"=solve_probitnormal(c(m,c)),
+    {stop("Type is not recognized.")}
+  )
+}
+
