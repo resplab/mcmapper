@@ -1,4 +1,4 @@
-simulate <- function(type=c('beta','logitnormal','probitnormal'), args=c(1,1), n_sim=10^6)
+simulate <- function(args, type=c('beta','logitnormal','probitnormal'), n_sim=10^6)
 {
   if(type=="logitnormal")
   {

@@ -18,18 +18,18 @@ We note that common two-parameter distributions for probabilities, such as beta 
 
 ## Lemma
 
-For a family of probability distirbutions with the above characteristics, the combination of expected value and c-statistic uniquly identifies the distirbution.
+For a family of probability distributions with the above characteristics, the combination of expected value and c-statistic uniquely identifies the distribution.
 
 
 ## Proof
 
-Let $F$ be the CDF from the family of distributions of interest. Let $m$ be its first moment, and $c$ its c-statistic, defined as the probability that a random draw from the distribution of $\pi$ among cases is larger than a random draw from its distribution among controls. i.e., $c:=P(\pi_2 > \pi_1 | Y_2=1, Y_1=0)$ where $\pi_i \sim F$ and $Y_i\sim Bernoulli(\pi_i)$ a realization of response value given the probability. We shall prove that $F$ is uniquely identifiable from {$m$, $c$}.
+Let $F$ be the CDF from the family of distributions of interest. Let $m$ be its first moment, and $c$ its c-statistic, defined as $c:=P(\pi_2 > \pi_1 | Y_2=1, Y_1=0)$ where $\pi_i \sim F$ and $Y_i\sim Bernoulli(\pi_i)$. $c$ is the probability that a random draw from the distribution of $\pi$ among 'cases' (those with $Y=1$) is larger than a random draw from its distribution among 'controls' (those with $Y=0$). We shall prove that $F$ is uniquely identifiable from {$m$, $c$}.
 
-First, applying the Bayes' rule to the distribution of $\pi$ among cases ($P(\pi|Y=1)$) and controls ($P(\pi|Y=0)$). reveals that the former has a PDF of $xf(x)/m$ and the latter $(1-x)f(x)/(1-m)$, where $f(x):=dF(x)/dx$ is the PDF of $F$. Thus we have:
+First, applying the Bayes' rule to the distribution of $\pi$ among cases ($P(\pi|Y=1)$) and controls ($P(\pi|Y=0)$) reveals that the former has a PDF of $xf(x)/m$ and the latter $(1-x)f(x)/(1-m)$, where $f(x):=dF(x)/dx$ is the PDF of $F$. Thus we have:
 
 $m(1-m)c=\int_0^1[xf(x)\int_0^x(1-y)f(y)dy]dx=\int_0^1[xf(x)\int_0^x f(y)dy]dx-\int_0^1[xf(x)\int_0^x yf(y)dy]dx=\int_0^1xf(x)F(x)dx-\int_0^1g(x)G(x)dx$, where $g(x)=xf(x)$ and $G(x)=\int_0^x g(y)dy$. Integrating by parts for both integrals results in
 
-$m(1-m)c=\frac{1}{2}xF(x)|_0^1-\frac{1}{2}\int_0^1F^2(x)dx-\frac{1}{2}G^2(x)|_0^1=\frac{1}{2}-\frac{1}{2}\int_0^1F^2(x)dx-m^2/2$
+$m(1-m)c=\frac{1}{2}xF^2(x)|_0^1-\frac{1}{2}\int_0^1F^2(x)dx-\frac{1}{2}G^2(x)|_0^1=\frac{1}{2}-\frac{1}{2}\int_0^1F^2(x)dx-m^2/2$
 
 
 i.e., $c$ is monotonically related to $\int_0^1F^2(x)dx$. As such, the goal is achieved by showing that {$m$, $\int_0^1F^2(x)dx$} uniquely identifies $F$. 
@@ -47,3 +47,13 @@ $\int_0^1 (F_1^2(x)-F_2^2(x))dx=\int_{x \in (0,z)} (F_1^2(x)-F_2^2(x))dx+\int_{x
 Without loss of generality, assume we label $F$s such that $F_1(x) > F_2(x)$ when $x \in (0,z)$. In this region,  $F_1(x)-F_2(x) > 0$, and (due to $F$s monotonically increasing) $0<F_1(x)+F_2(x) < F_1(z)+F_2(z) =2z^*$. As such, replacing $F_1(x)+F_2(x)$ by the larger positive quantity $2z^*$ will increase this term. As well, in the $x\in (z,1)$ region, $F_1(x)-F_2(x) < 0$, and $0<F_1(x)+F_2(x) < F_1(z)+F_2(z)=2z^*$. As such, replacing $F_1(x)+F_2(x)$ by the smaller positive quantity $2z^*$ will also increase this term. Therefore we have
 
 $\int_0^1 (F_1^2(x)-F_2^2(x))dx < 2z^*(\int_{x \in (0,z)} (F_1(x)-F_2(x))dx+\int_{x \in (z,1)} (F_1(x)-F_2(x)))dx$, and the term on the right hand side is zero because of the equality of the area under the CDFs. Therefore, $\int_0^1 (F_1^2(x)-F_2^2(x))dx < 0$.
+
+## Remarks
+This proof can easily be extended to other metrics of central tendency and discrimination. For example, if instead of mean, the median (or any quantile) is available, the proof immediately applies because the quantile becomes the sole crossing point of any two $F$s, and again the equivalence of $\int_0^1F^2(x)dx$ guarantees the equivalence of the two distributions. 
+
+Similarly, if one knows the Gini index of a distribution, then due to the unique relationship between the c-statistic and gini[REF], the proof is applicable.
+
+## Finding the solutions
+We note that for some distributions including beta and probit-normal, knowing $m$ immediately solves for one parameter. As such, numerical optimization reduces to one-dimensional optimization. For beta distribution, the relationship is algebraic. For probit-normal, it requires evaluating the $\Phi^{-1}$ which cannot be expressed in closed-form, nonetheless there are numerically tuned algorithms widely implemented in several software
+
+For logit-normal distribution, where there are no closed-form solutions, we suggest a two-dimensional gradient descent. 
