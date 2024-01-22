@@ -76,3 +76,17 @@ populate_table <- function()
 
   out
 }
+
+
+
+
+plot_dist <- function(args, type=c('beta','logitnormal','probitnormal'), CDF=T, n_bins=10^3)
+{
+  x <- seq(from=0, to=1, length.out=n_bins)
+  tmp <- as.list(c(NA,unname(args)))
+  tmp[[1]] <- x
+  if(CDF) pfx<-"p" else pfx<-"d";
+  y <- do.call(args=tmp, what=paste0(pfx,type))
+
+  plot(x,y,type='l')
+}
