@@ -532,12 +532,15 @@ mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitn
     warning("Extreme values for parameters are requested. The algorithms might not be reliable. Check the results (e.g., via simulation).")
   }
 
-  switch(
+  out <- list(type=type)
+
+  out$value <- switch(
     type,
+
     "beta"=mcmap_beta(c(m,c)),
+
     "logitnorm"=
     {
-
       if(abs(m-0.5)>0.49  | abs(c-0.75)>0.19)
       {
         message("Invoking 1D version of logitnorm mapper given the extrema parameter values.")
@@ -548,8 +551,29 @@ mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitn
         mcmap_logitnorm(c(m,c))
       }
     },
+
     "probitnorm"=mcmap_probitnorm(c(m,c)),
     {stop("Type is not recognized.")}
   )
+
+  class(out)<-"mcmapper_output"
+
+  out
 }
 
+
+
+#'@export
+plot.mcmapper_output <- function(mcmapper_output, CDF=T, bins=1000, ...)
+{
+  x <- (0:bins)/bins
+
+  strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
+
+  tmp <- as.list(c(NA,res$value))
+  tmp[[1]] <- x
+
+  y <- do.call(strFun,args=tmp)
+
+  plot(x,y,...)
+}

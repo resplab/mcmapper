@@ -1,18 +1,19 @@
-test_via_sim <- function(args, type=c('beta','logitnorm','probitnorm'), n_sim=10^6)
+test_via_sim <- function(mcmapper_output, n_sim=10^6, test_threshold=0.01, sig=0.05)
 {
-  if(type=="logitnorm")
+  args <- mcmapper_output$value
+  if(mcmapper_output$type=="logitnorm")
   {
     pi <- 1/(1+exp(-rnorm(n_sim,args[1],args[2])))
     Y <- rbinom(n_sim,1,pi)
   }
 
-  if(type=="probitnorm")
+  if(mcmapper_output$type=="probitnorm")
   {
     pi <- pnorm(rnorm(n_sim,args[1],args[2]))
     Y <- rbinom(n_sim,1,pi)
   }
 
-  if(type=="beta")
+  if(mcmapper_output$type=="beta")
   {
     pi <- rbeta(n_sim,args[1],args[2])
     Y <- rbinom(n_sim,1,pi)
@@ -20,7 +21,12 @@ test_via_sim <- function(args, type=c('beta','logitnorm','probitnorm'), n_sim=10
 
   require(pROC)
 
-  c(m=mean(pi), c=pROC::roc(Y~pi,)$auc)
+  r <- pROC::roc(Y~pi, ci=T)
+  z <- as.vector(r$ci)
+  se <- (z[3]-z[1])/2/1.96
+  Pc <- pnorm(mcmapper_output$target[2]*(1-test_threshold),z[2],se)+1-pnorm(mcmapper_output$target[2]*(1-test_threshold),z[2],se)
+  se <- sd(pi-mcmapper_output$target[1])
+  c(m=mean(pi), c=r$auc)
 }
 
 
@@ -80,13 +86,3 @@ populate_table <- function()
 
 
 
-plot_dist <- function(args, type=c('beta','logitnorm','probitnorm'), CDF=T, n_bins=10^3)
-{
-  x <- seq(from=0, to=1, length.out=n_bins)
-  tmp <- as.list(c(NA,unname(args)))
-  tmp[[1]] <- x
-  if(CDF) pfx<-"p" else pfx<-"d";
-  y <- do.call(args=tmp, what=paste0(pfx,type))
-
-  plot(x,y,type='l')
-}
