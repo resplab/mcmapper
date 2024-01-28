@@ -1,12 +1,12 @@
-simulate <- function(args, type=c('beta','logitnormal','probitnormal'), n_sim=10^6)
+test_via_sim <- function(args, type=c('beta','logitnorm','probitnorm'), n_sim=10^6)
 {
-  if(type=="logitnormal")
+  if(type=="logitnorm")
   {
     pi <- 1/(1+exp(-rnorm(n_sim,args[1],args[2])))
     Y <- rbinom(n_sim,1,pi)
   }
 
-  if(type=="probitnormal")
+  if(type=="probitnorm")
   {
     pi <- pnorm(rnorm(n_sim,args[1],args[2]))
     Y <- rbinom(n_sim,1,pi)
@@ -29,17 +29,17 @@ simulate <- function(args, type=c('beta','logitnormal','probitnormal'), n_sim=10
 m <- 0.086
 c <- 0.81
 
-res_logitnormal <- solve_logitnormal(c(m,c))
-res_probitnormal <- solve_probitnormal(c(m,c))
-res_beta <- solve_beta(c(m,c))
+res_logitnorm <- mcmap_logitnorm(c(m,c))
+res_probitnorm <- mcmap_probitnorm(c(m,c))
+res_beta <- mcmap_beta(c(m,c))
 
 x <- (0:(10000-1))/10000
-plot(x, dlogitnormal(x,res_logitnormal[1],res_logitnormal[2]), type='l')
-lines(x, dprobitnormal(x,res_probitnormal[1],res_probitnormal[2]), type='l', col='blue')
+plot(x, dlogitnorm(x,res_logitnorm[1],res_logitnorm[2]), type='l')
+lines(x, dprobitnorm(x,res_probitnorm[1],res_probitnorm[2]), type='l', col='blue')
 lines(x, dbeta(x,res_beta[1],res_beta[2]), type='l', col='red')
 
-plot(x, plogitnormal(x,res_logitnormal[1],res_logitnormal[2]), type='l')
-lines(x, pprobitnormal(x,res_probitnormal[1],res_probitnormal[2]), type='l', col='blue')
+plot(x, plogitnorm(x,res_logitnorm[1],res_logitnorm[2]), type='l')
+lines(x, pprobitnorm(x,res_probitnorm[1],res_probitnorm[2]), type='l', col='blue')
 lines(x, pbeta(x,res_beta[1],res_beta[2]), type='l', col='red')
 
 
@@ -49,7 +49,7 @@ populate_table <- function()
   out <- data.frame(m=double(), c=double(), type=character(), parm1=double(), parm2=double())
 
   ms <- (1:99)/100
-  cs <- (55:95)/100
+  cs <- (51:99)/100
 
   N <- length(ms)*length(cs)*3
 
@@ -61,17 +61,17 @@ populate_table <- function()
     {
       cat(c(m,c),"|");
 
-      res <- solve_logitnormal(c(m,c)); if(is.null(res)) {res<-c(NA,NA); message("Bad")}
-      out[index,] <- list(m,c,"logitnormal",res[1],res[2])
+      res <- mcmap(c(m,c), "logitnorm"); if(is.null(res)) {res<-c(NA,NA); message("Bad")}
+      out[index,] <- list(m,c,"logitnorm",res[1],res[2])
       index <- index+1
 
-      res <- solve_probitnormal(c(m,c)); if(is.null(res)) {res<-c(NA,NA); message("Bad")}
-      out[index,] <- list(m,c,"probitnormal",res[1],res[2])
-      index <- index+1
-
-      res <- solve_beta(c(m,c)); if(is.null(res)) {res<-c(NA,NA); message("Bad")}
-      out[index,] <- list(m,c,"beta",res[1],res[2])
-      index <- index+1
+      # res <- mcmap(c(m,c),"probitnorm"); if(is.null(res)) {res<-c(NA,NA); message("Bad")}
+      # out[index,] <- list(m,c,"probitnorm",res[1],res[2])
+      # index <- index+1
+      #
+      # res <- mcmap(c(m,c),"beta"); if(is.null(res)) {res<-c(NA,NA); message("Bad")}
+      # out[index,] <- list(m,c,"beta",res[1],res[2])
+      # index <- index+1
     }
 
   out
@@ -80,7 +80,7 @@ populate_table <- function()
 
 
 
-plot_dist <- function(args, type=c('beta','logitnormal','probitnormal'), CDF=T, n_bins=10^3)
+plot_dist <- function(args, type=c('beta','logitnorm','probitnorm'), CDF=T, n_bins=10^3)
 {
   x <- seq(from=0, to=1, length.out=n_bins)
   tmp <- as.list(c(NA,unname(args)))
