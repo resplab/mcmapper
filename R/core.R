@@ -501,6 +501,45 @@ mcmap_beta <- function(target=c(m=0.25,c=0.75), init=NULL)
 
 
 
+#Log-transformed alpha and beta
+#'@export
+mcmap_beta2 <- function(target=c(m=0.25,c=0.75), init=NULL)
+{
+  m <- target[1]
+  c <- target[2]
+
+  if(m>0.5)
+  {
+    tmp <- mcmap_beta(c(1-m,c), init)
+    return(c(tmp[2],tmp[1]))
+  }
+
+  F1 <- 1-m
+  F2 <- 1- (2*c*m-(2*c-1)*m^2)
+
+  #message(paste0("F1:",F1," , F2:",F2))
+
+  f <- function(x)
+  {
+    #message(paste(x,collapse=","))
+    L <- 0
+    U <- 1
+    f2 <- integrate(function(x, ln_alpha) {pbeta(x, exp(ln_alpha), exp(ln_alpha)*(1-m)/m)^2}, L, U, ln_alpha=x)$value
+
+    (f2-F2)^2
+  }
+
+  if(is.null(init))
+  {
+    init <- c(0)
+  }
+  res <- optim(init, f, method="Brent", lower=-c(10), upper=c(10)) #, control=list(trace=100))
+
+  if(res$convergence==0)
+    c(alpha=exp(res$par[1]), beta=exp(res$par[1])*(1-m)/m)
+  else
+    NULL
+}
 
 
 #'@export
