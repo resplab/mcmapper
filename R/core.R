@@ -16,7 +16,8 @@ qlogitnorm <- function(x, mu, sigma) {1/(1+exp(-(qnorm(x,mu,sigma))))}
 dprobitnorm <- function(x, mu, sigma) {dnorm(qnorm(x),mu,sigma)/dnorm(qnorm(x))}
 #'@export
 pprobitnorm <- function(x, mu, sigma) {pnorm(qnorm(x),mu,sigma)}
-
+#'@export
+rprobitnorm <- function(n,mu,sigma){pnorm(rnorm(n,mu,sigma))}
 
 elogitnorm_base <- function(mu, sigma, N=100)
 {
@@ -491,7 +492,8 @@ mcmap_beta <- function(target=c(m=0.25,c=0.75), init=NULL)
   {
     init <- c(1)
   }
-  res <- optim(init, f, method="Brent", lower=c(0.0001), upper=c(10000)) #, control=list(trace=100))
+
+  res <- optim(init, f, method="Brent", lower=0.0001, upper=10000) #, control=list(trace=100))
 
   if(res$convergence==0)
     c(alpha=res$par[1], beta=res$par[1]*(1-m)/m)

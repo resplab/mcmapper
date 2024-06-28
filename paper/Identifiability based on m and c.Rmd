@@ -2,7 +2,8 @@
 title: "Characterization of certain family of distributions based on their first moment and c-statistic"
 author: "TBD"
 date: "2024-03-28"
-output: pdf_document
+output: 
+  bookdown::pdf_document2: default
 ---
 
 ```{r setup, include=FALSE}
@@ -64,8 +65,13 @@ For \mbox{logit}normal distribution, moments are not analytically expressible[RE
 
 
 ## Brief simulation studies
-TODO: Evaluate the convergence and precision via simulating pi from 0.001 to 0.500 by 0.001, and c from 0.51 to 0.99 by 0.01 steps.
+We conducted a simulation study to verify the validity of our algorithm. Using a simulation-based calibration approach (Section 4 of @gelman2020bayesian), we sought to verify whether our algorithm could successfully recover the two parameters of the beta, logit-normal, and probit-normal distributions for given prevalence $\pi$ and c-statistic $c$ values. For each of $\pi=0.01, 0.02, \dots, 0.49, 0.50$ and $c=0.51, 0.52, \dots, 0.98, 0.99$, we first used our algorithm to estimate the two parameters for each of the three distributions. Next, we drew $n_{inner} = \frac{10}{\pi}$ number of $\pi_i$ from the distribution with the estimated parameters, drew $n_{inner}$ samples from the binomial distribution with probability $\pi_i$ (implying the effective sample size is 10 on average), calculated the sample prevalence $\hat \pi$ and sample c-statistic $\hat c$ along with their $(1-\alpha)\%$ CIs, and checked whether $\pi$ and c-statistic were contained in the corresponding CIs. We iterated this process for $n_{outer}=10,000$ times, calculated the corresponding coverage probabilities (i.e., the proportion of times each target value was contained), and checked whether they were close to the target coverage probability of $(1-\alpha)\%$. We set $\alpha=0.10$ in our simulation study.
 
+Simulation results illustrate that our algorithm could recover the parameters successfully for typical prevalence and c-statistic values (Figure \@ref(fig:sim-fig)). However, we observed that the coverage probabilities modestly deviated from the target value (90\% in our case) for extreme values (left corners and right corners in the figure), indicating limitations of the implemented optimization method for handling such extreme values.
+
+```{r sim-fig, fig.cap = "Coverage probabilities of the prevelance (top) and c-statistic (bottom) by each of the beta (left), logit-normal (mid), and logit-probit (right) distributions based on 10,000 simulation runs, with the target coverage probabiltiy of 90%",echo=F,out.width='100%'}
+knitr::include_graphics("../figures/fig_sim.jpeg")
+```
 
 ## Remarks
 An area of application for these results is sample size calculations for risk prediction models. Such methods generally require an estimation of the variance of predicted risks in the target population[REF], a quantity that is seldom reported. However, the majority of validation studies report the c-statistic (alone or alongside the Receiver Operating Characteristic curve) and the average value of predicted risks. One can then use these results to obtain an estimate for the variance. Different families of distributions can be used in the form of sensitivity analysis.
@@ -77,6 +83,13 @@ Do these developments apply to other measures of centrality such as median and m
 
 On the other hand, this proof can be extended to some other metrics of dispersion. For example, if instead of c-statistic, one knows the Gini index, due to the unique relationship between the c-statistic and Gini[REF], these results are applicable.
 
+# References
 
+@article{gelman2020bayesian,
+  title={Bayesian workflow},
+  author={Gelman, Andrew and Vehtari, Aki and Simpson, Daniel and Margossian, Charles C and Carpenter, Bob and Yao, Yuling and Kennedy, Lauren and Gabry, Jonah and B{\"u}rkner, Paul-Christian and Modr{\'a}k, Martin},
+  journal={arXiv preprint arXiv:2011.01808},
+  year={2020}
+}
 
 
