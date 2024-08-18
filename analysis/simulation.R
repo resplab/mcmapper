@@ -52,7 +52,8 @@ choose_ralgo <- function(type){
 }
 
 alpha_coverage <- 0.90
-z_crit <- abs(qnorm((1-alpha_coverage)/2))
+alpha <- (1-alpha_coverage)/2
+qcrit <- abs(qnorm(alpha))
 
 # parallelization on mac
 library(doParallel)
@@ -76,6 +77,7 @@ foreach(i=1:nrow(df_algo_sol),.combine = "+") %dopar% {
     tmp_pi <- ralgo(n_inner,tmp_row$arg1,tmp_row$arg2)
     tmp_pi_mean <- mean(tmp_pi)
     tmp_pi_se <- se(tmp_pi)
+    tmp_pi_CI <- c(tmp_pi_mean-qcrit*tmp_pi_se,tmp_pi_mean + qcrit*tmp_pi_se)
 
     tmp_Y <- rbinom(n_inner,1,tmp_pi)
 
@@ -83,16 +85,13 @@ foreach(i=1:nrow(df_algo_sol),.combine = "+") %dopar% {
       next
     }
 
-    tmp_roc <- pROC::roc(tmp_Y~tmp_pi, ci=T,quiet=T)
+    tmp_roc <- pROC::roc(tmp_Y~tmp_pi, ci=T,quiet=T,ci.method = c("delong"),conf.level=alpha_coverage)
     tmp_cstat <- as.vector(tmp_roc$ci)
     tmp_cstat_mean <- tmp_cstat[2]
-    tmp_cstat_se <- (tmp_cstat[3]-tmp_cstat[1])/2/qnorm(0.975)
-
-    tmp_pi_CI <- c(tmp_pi_mean-z_crit*tmp_pi_se,tmp_pi_mean+z_crit*tmp_pi_se)
-    tmp_cstat_CI <- c(tmp_cstat_mean-z_crit*tmp_cstat_se,tmp_cstat_mean+z_crit*tmp_cstat_se)
+    tmp_cstat_CI <- c(tmp_cstat[1],tmp_cstat[3])
 
     tmp_pi_check <- c(tmp_pi_check,as.numeric((tmp_true[1]<=tmp_pi_CI[2]) & (tmp_true[1]>=tmp_pi_CI[1])))
-    tmp_cstat_check <-c(tmp_pi_check,as.numeric((tmp_true[2]<=tmp_cstat_CI[2]) & (tmp_true[2]>=tmp_cstat_CI[1])))
+    tmp_cstat_check <-c(tmp_cstat_check,as.numeric((tmp_true[2]<=tmp_cstat_CI[2]) & (tmp_true[2]>=tmp_cstat_CI[1])))
   }
 
   res <- c(unlist(tmp_row),coverage_prob_arg1=mean(tmp_pi_check,na.rm=T),coverage_prob_arg2=mean(tmp_cstat_check,na.rm=T))
@@ -102,46 +101,10 @@ foreach(i=1:nrow(df_algo_sol),.combine = "+") %dopar% {
 
 stop(cl)
 
-# zero values for prev = 0.03, c_stat=0.55
-tmp_pi_check <- tmp_cstat_check <- c()
-tmp_row <- df_algo_sol %>%
-  filter(prev==0.03 & c_stat==0.55) %>%
-  filter(type=='logit-norm')
-
-tmp_true <- c(tmp_row$prev,tmp_row$c_stat)
-ralgo <- choose_ralgo(tmp_row$type)
-for(j in 1:n_outer){
-
-  tmp_pi <- ralgo(n_inner,tmp_row$V3,tmp_row$V4)
-  tmp_pi_mean <- mean(tmp_pi)
-  tmp_pi_se <- se(tmp_pi)
-
-  tmp_Y <- rbinom(n_inner,1,tmp_pi)
-
-  if(length(unique(tmp_Y))!=2){
-    next
-  }
-
-  tmp_roc <- pROC::roc(tmp_Y~tmp_pi, ci=T,quiet=T)
-  tmp_cstat <- as.vector(tmp_roc$ci)
-  tmp_cstat_mean <- tmp_cstat[2]
-  tmp_cstat_se <- (tmp_cstat[3]-tmp_cstat[1])/2/qnorm(0.975)
-
-  tmp_pi_CI <- c(tmp_pi_mean-z_crit*tmp_pi_se,tmp_pi_mean+z_crit*tmp_pi_se)
-  tmp_cstat_CI <- c(tmp_cstat_mean-z_crit*tmp_cstat_se,tmp_cstat_mean+z_crit*tmp_cstat_se)
-
-  tmp_pi_check <- c(tmp_pi_check,as.numeric((tmp_true[1]<=tmp_pi_CI[2]) & (tmp_true[1]>=tmp_pi_CI[1])))
-  tmp_cstat_check <-c(tmp_pi_check,as.numeric((tmp_true[2]<=tmp_cstat_CI[2]) & (tmp_true[2]>=tmp_cstat_CI[1])))
-}
-
-res <- c(unlist(tmp_row),coverage_prob_arg1=mean(tmp_pi_check,na.rm=T),coverage_prob_arg2=mean(tmp_cstat_check,na.rm=T))
-
 # process results
 sim_dir <- "simulation_results"
 
 sim_files <- list.files(sim_dir)
-
-
 
 sim_results <- lapply(sim_files,function(tmp_sim){
   read_rds(paste0(sim_dir,"/",tmp_sim))
@@ -167,13 +130,9 @@ write_rds(sim_results,"results/simulation_results.rds")
 
 sim_results <- read_rds("results/simulation_results.rds")
 
-
 ggplot(data=sim_results,aes(x=prev,y=c_stat,fill=`Coverage probability`))+
   geom_tile() +
   facet_grid(parameter~type)+
-  # scale_fill_gradientn(colours = colorRampPalette(c('red', 'white', 'blue'))(11),
-  #                       breaks=c(0.87,0.88,0.89,0.90,0.91,0.92),
-  #                       limits=c(0.87,0.91))+
   theme_classic() +
   xlab("Prevalence") +
   ylab("C-statistic") +
