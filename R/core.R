@@ -496,7 +496,7 @@ mcmap_beta <- function(target=c(m=0.25,c=0.75), init=NULL)
   res <- optim(init, f, method="Brent", lower=0.0001, upper=10000) #, control=list(trace=100))
 
   if(res$convergence==0)
-    c(alpha=res$par[1], beta=res$par[1]*(1-m)/m)
+    c(alpha=unname(res$par[1]), beta=unname(res$par[1]*(1-m)/m))
   else
     NULL
 }
@@ -611,7 +611,7 @@ plot.mcmapper_output <- function(mcmapper_output, CDF=T, bins=1000, ...)
 
   strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
 
-  tmp <- as.list(c(NA,res$value))
+  tmp <- as.list(c(NA,unname(mcmapper_output$value)))
   tmp[[1]] <- x
 
   y <- do.call(strFun,args=tmp)
