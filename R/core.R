@@ -605,7 +605,7 @@ mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitn
 
 
 #'@export
-plot.mcmapper_output <- function(mcmapper_output, CDF=T, bins=1000, ...)
+plot.mcmapper_output <- function(mcmapper_output, CDF=F, bins=1000, ...)
 {
   x <- (0:bins)/bins
 

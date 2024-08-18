@@ -38,15 +38,9 @@ devtools::install_github("resplab/mcmapper")
 Gupta et al validated their risk prediction model for the risk of
 deterioration in hospitalized patients with COVID-19 infection. In the
 external validation sample (from London, UK), the prevalence of
-deterioration was 43%, the model had a c-statistics of 0.77. The model
-was well calibrated. The model was only slightly miscalibrated
-9calibration intercept of 0 and slope of 0.96). The calibration plot was
-monotonic. This means the c-statistic relating predicted risks with
-observed outcomes remains the same for relating calibrated risks and
-observed outcome.
-
-Working with the logit-normal distribution, and recover the distribution
-of calibrated risks:
+deterioration was 43%, the model had a c-statistics of 0.77. Assuming
+that calibrated risks had a logit-normal distribution, we can recover
+the parameters:
 
 ``` r
 library(mcmapper)
@@ -65,19 +59,9 @@ res
 #> [1] "mcmapper_output"
 ```
 
-Given the information provided on the calibration slope and intercept,
-the distribution of predicted risks will be specified as
-
-$\pi \sim logitnom(-0.3605462,1.1362852)$. For comparison, we overlay
-the Beta(1.33, 1.75) that Riley et al estimated using the provided
-histogram (gray line).
-
 ``` r
-x <- (0:100)/100
 
-plot(x,mcmapper::dlogitnorm(x, res$value[1], res$value[2]*0.96),col='red',type='l', lwd=2)
-#lines(x,mcmapper::dlogitnorm(x, res$value[1], res$value[2]*0.96),col='blue',type='l')
-lines(x,dbeta(x,1.33,1.75),type='l', col='gray', lwd=2)
+plot(res, type='l')
 ```
 
-<img src="man/figures/README-cars-1.png" width="100%" />
+<img src="man/figures/README-example-1.png" width="100%" />
