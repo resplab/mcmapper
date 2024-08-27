@@ -18,9 +18,14 @@ dprobitnorm <- function(x, mu, sigma) {dnorm(qnorm(x),mu,sigma)/dnorm(qnorm(x))}
 pprobitnorm <- function(x, mu, sigma) {pnorm(qnorm(x),mu,sigma)}
 #'@export
 rprobitnorm <- function(n,mu,sigma){pnorm(rnorm(n,mu,sigma))}
+#'@export
+qprobitnorm <- function(x, mu, sigma) {pnorm(qnorm(x,mu,sigma))}
+
+
 
 elogitnorm_base <- function(mu, sigma, N=100)
 {
+  if(mu==0) return(0.5)
   A <- B <- C <- 0
   n <- 1:N
   A <- exp(-sigma^2*n^2/2)*sinh(n*mu)*tanh(n*sigma^2/2)
@@ -40,6 +45,7 @@ elogitnorm_base <- function(mu, sigma, N=100)
 }
 
 
+#Quickly uses up the stack. Deprecated in favor of the nonrecursive version
 elogitnorm_recursive <- function(mu, sigma)
 {
   if(mu>0)
@@ -55,6 +61,8 @@ elogitnorm_recursive <- function(mu, sigma)
 }
 
 
+
+
 #standard
 elogitnorm_nonrecursive <- function(mu, sigma)
 {
@@ -68,7 +76,7 @@ elogitnorm_nonrecursive <- function(mu, sigma)
 
   if(steps==0) {return(elogitnorm_base(mu,sigma))}
 
-  if(steps>1000) {warning("Too many steps when evaluating (mu,sigma): ",mu,sigma)}
+  if(steps>10000) {warning("Too many steps when evaluating (mu,sigma): ",mu,sigma)}
 
   S <- 0;
   P <- 1
@@ -87,13 +95,15 @@ elogitnorm_nonrecursive <- function(mu, sigma)
 }
 
 
+
 #'@export
-elogitnorm <- function(mu,sigma)
+elogitnorm <- function(mu, sigma)
 {
   #message(mu,",",sigma)
-  steps <- floor(-mu/sigma^2)
-  if(steps>1000)
+  steps <- floor(abs(mu/sigma^2))
+  if(steps>10000)
   {
+    warning("Extreme values for logitnorm - numerical integration invoked")
     return(1-integrate(plogitnorm,0,1,mu=mu,sigma=sigma)$value)
   }
   else
@@ -280,7 +290,7 @@ mcmap_logitnorm2 <- function(target=c(m=0.25,c=0.75), init=NULL)
 
 
 
-#This one reduces the prblem into two root-finding ones
+#This one reduces the problem into two root-finding ones
 #'@export
 mcmap_logitnorm3 <- function(target=c(m=0.25,c=0.75), interval=NULL)
 {
@@ -503,6 +513,7 @@ mcmap_beta <- function(target=c(m=0.25,c=0.75), init=NULL)
 
 
 
+
 #Log-transformed alpha and beta
 #'@export
 mcmap_beta2 <- function(target=c(m=0.25,c=0.75), init=NULL)
@@ -542,6 +553,9 @@ mcmap_beta2 <- function(target=c(m=0.25,c=0.75), init=NULL)
   else
     NULL
 }
+
+
+
 
 
 #'@export
