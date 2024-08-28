@@ -176,8 +176,8 @@ sim_results_detailed <- lapply(sim_files,function(tmp_sim){
   mutate(across(c(prev:c_stat,arg1:med_c),as.numeric)) %>%
   mutate(coverage_prob_arg1=round(coverage_prob_arg1,2),
          coverage_prob_arg2 = round(coverage_prob_arg2,2),
-         med_pi = round(med_pi,2),
-         med_c = round(med_c,2)) %>%
+         med_pi = round(med_pi,5),
+         med_c = round(med_c,5)) %>%
   arrange(type) %>%
   mutate(diff_pi = prev - med_pi,
          diff_c = c_stat - med_c) %>%
@@ -221,9 +221,9 @@ ggplot(data=sim_results_detailed,aes(x=prev,y=c_stat,fill=difference))+
   theme_classic() +
   xlab("Prevalence") +
   ylab("C-statistic") +
-  scale_fill_gradient2(low="orange",mid="white",high='red',
-                       limits=c(-0.05,0.05),
-                       midpoint=0,breaks=c(-0.05,0,0.05))+
+  # scale_fill_gradient2(low="orange",mid="white",high='red',
+  #                      limits=c(-0.05,0.05),
+  #                      midpoint=0,breaks=c(-0.05,0,0.05))+
   # "BrBG"
   # scale_fill_gradient(limits=c(-0.02,0.02))+
   theme(legend.title = element_text("Difference"),
