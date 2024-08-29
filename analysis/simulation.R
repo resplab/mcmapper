@@ -7,6 +7,42 @@ set.seed(2024)
 prevs <- seq(from = 0.01, to = 0.50, by = 0.01)
 c_stats <- seq(from = 0.51, to = 0.99, by = 0.01)
 
+se_mc <- function(n, m, c)
+{
+  se_m <- sqrt(m*(1-m)/n)
+  se_c <- sqrt(c*(1-c)*((1+(n/2-1)*((1-c)/(2-c)))+((n/2-1)*c)/(1+c))/(n^2*m*(1-m)))
+
+  c(se_m=se_m, se_c=se_c)
+}
+
+
+
+# Define the function to solve for n
+solve_for_n <- function(m, c, se_m, se_c) {
+  n_m <- m*(1-m)/se_m^2
+
+  # Calculate the coefficients of the quadratic equation
+  A <- se_c^2 * m * (1 - m)
+  B <- -0.5 * c * (1 - c) * ((1 - c) / (2 - c) + c / (1 + c))
+  C <- -c * (1 - c) * (1 - (1 - c) / (2 - c) - c / (1 + c))
+
+  # Check if the discriminant is non-negative
+  discriminant <- B^2 - 4 * A * C
+  if (discriminant < 0) {
+    return("No real solution")
+  }
+
+  # Use the quadratic formula to solve for n
+  n1 <- (-B + sqrt(discriminant)) / (2 * A)
+  n2 <- (-B - sqrt(discriminant)) / (2 * A)
+
+  # Return the solutions
+  n_c <-max(n1, n2)
+
+  c(n_m=n_m, n_c=n_c)
+}
+
+
 param_grid <- expand.grid(prev = prevs, c_stat = c_stats,type=c("beta","logitnorm",'probitnorm'))
 
 if(file.exists("results/algos_sol.rds")){
@@ -40,10 +76,10 @@ df_algo_sol <- read_rds("results/algos_sol.rds") %>%
   rename(arg1=V4,
          arg2=V5)
 
-sim_dir <- "simulation_results"
+sim_dir <- "sim_results"
 dir.create(sim_dir)
 
-n_outer <- 10000
+n_outer <- 1
 
 se <- function(x) {sqrt(var(x)/length(x))}
 
@@ -65,11 +101,11 @@ qcrit <- abs(qnorm(alpha))
 #   riley_N <- function(N){
 #     numer <- c_stat* (1-c_stat) * (1+(N/2-1)*((1-c_stat)/(2-c_stat))+ (N/2-1)*c_stat / (1+c_stat) )
 #     denom <- N^2 * prev * (1-prev)
-#     print(sqrt(numer/denom))
+#     # print(sqrt(numer/denom))
 #     target_se - sqrt(numer/denom)
 #   }
 #
-#     rootSolve::uniroot.all(riley_N,c(1,10000000),trace=1)
+#     rootSolve::uniroot.all(riley_N,c(1,10000000),trace=0)
 #
 #   }
 
@@ -155,7 +191,7 @@ sim_results <- lapply(sim_files,function(tmp_sim){
                             "Coverage for c-statistic"),
          parameter = factor(parameter,levels=c("Coverage for prevalence","Coverage for c-statistic")))
 
-write_rds(sim_results,"results/simulation_results.rds")
+write_rds(sim_results,"results/simulation_results_once.rds")
 
 # detailed info -----------------------------------------------------------
 # # compute median
@@ -192,10 +228,10 @@ sim_results_detailed <- lapply(sim_files,function(tmp_sim){
                             "Difference in c-statistic"),
          parameter = factor(parameter,levels=c("Difference in prevalence","Difference in c-statistic")))
 
-write_rds(sim_results_detailed,"results/simulation_results_detailed.rds")
+write_rds(sim_results_detailed,"results/simulation_results_detailed_once.rds")
 
 
-sim_dir <- "simulation_results"
+sim_dir <- "sim_results"
 sim_results <- read_rds("results/simulation_results.rds")
 
 ggplot(data=sim_results,aes(x=prev,y=c_stat,fill=`Coverage probability`))+
