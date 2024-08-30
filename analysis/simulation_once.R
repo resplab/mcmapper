@@ -177,18 +177,28 @@ write_rds(sim_results_detailed,"results/simulation_results_detailed_once.rds")
 
 sim_results_detailed <- read_rds("results/simulation_results_detailed_once.rds")
 
-ggplot(data=sim_results_detailed,aes(x=prev,y=c_stat,fill=difference))+
+ggplot(data=sim_results_detailed %>%
+         mutate(rel_diff = ifelse(parameter=="Difference in prevalence",
+                                  difference/prev*100,
+                                  difference/c_stat*100),
+                parameter = ifelse(parameter == "Difference in prevalence",
+                                   "Relative difference in prevalence (%)",
+                                   "Relative difference in c-statistic (%)"),
+                parameter = factor(parameter,
+                                   c("Relative difference in prevalence (%)","Relative difference in c-statistic (%)"),
+                                   c("Relative difference in prevalence (%)","Relative difference in c-statistic (%)"))),
+       aes(x=prev,y=c_stat,fill=rel_diff))+
   geom_tile() +
   facet_grid(parameter~type)+
   theme_classic() +
   xlab("Prevalence") +
   ylab("C-statistic") +
-  # scale_fill_gradient2(low="orange",mid="white",high='red',
-  #                      limits=c(-0.05,0.05),
-  #                      midpoint=0,breaks=c(-0.05,0,0.05))+
+  # guides(fill=guide_legend(title="Relative Difference (%)"))+
+  scale_fill_continuous(name = "Relative Difference (%)")+
+  # scale_fill_gradient(limits=c(-3,3))+
+  theme_significance(base_size = 15) -> fig_sim
   # "BrBG"
-  # scale_fill_gradient(limits=c(-0.02,0.02))+
-  theme(legend.title = element_text("Difference"),
-        text = element_text(size=15)) -> fig_sim
+  # scale_fill_gradient(limits=c(-,0.02))+
+
 
 ggsave("figures/fig_sim_once.jpeg",plot=fig_sim,device = "jpg")
