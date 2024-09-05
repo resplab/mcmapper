@@ -1,7 +1,7 @@
 library(tidyverse)
 library(mcmapper)
 library(pROC)
-
+library(RSSthemes)
 set.seed(2024)
 
 prevs <- seq(from = 0.01, to = 0.50, by = 0.01)
@@ -179,24 +179,28 @@ sim_results_detailed <- read_rds("results/simulation_results_detailed_once.rds")
 
 ggplot(data=sim_results_detailed %>%
          mutate(rel_diff = ifelse(parameter=="Difference in prevalence",
-                                  difference/prev*100,
-                                  difference/c_stat*100),
+                                  difference,
+                                  difference),
                 parameter = ifelse(parameter == "Difference in prevalence",
-                                   "Relative difference in prevalence (%)",
-                                   "Relative difference in c-statistic (%)"),
-                parameter = factor(parameter,
-                                   c("Relative difference in prevalence (%)","Relative difference in c-statistic (%)"),
-                                   c("Relative difference in prevalence (%)","Relative difference in c-statistic (%)"))),
+                                   "Difference in m",
+                                   "Difference in c")),
+                # parameter = factor(parameter,
+                #                    c("Difference in prevalence","Difference in c-statistic"),
+                #                    c("Difference in prevalence","Difference in c-statistic"))),
        aes(x=prev,y=c_stat,fill=rel_diff))+
   geom_tile() +
   facet_grid(parameter~type)+
   theme_classic() +
-  xlab("Prevalence") +
-  ylab("C-statistic") +
+  xlab("Expected m") +
+  ylab("Expected c") +
   # guides(fill=guide_legend(title="Relative Difference (%)"))+
-  scale_fill_continuous(name = "Relative Difference (%)")+
+  # scale_fill_continuous(name = "Difference")+
+  scale_fill_gradient2(name = "") +
   # scale_fill_gradient(limits=c(-3,3))+
-  theme_significance(base_size = 15) -> fig_sim
+  theme_significance(base_size = 25) +
+  theme(axis.text=element_text(size=20),
+        legend.key.height = unit(0.5, "cm"),
+        legend.key.width =  unit(2, "cm")) -> fig_sim
   # "BrBG"
   # scale_fill_gradient(limits=c(-,0.02))+
 
