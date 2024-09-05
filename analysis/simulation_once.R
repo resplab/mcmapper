@@ -197,9 +197,8 @@ ggplot(data=sim_results_detailed %>%
   # scale_fill_continuous(name = "Difference")+
   scale_fill_gradient2(name = "") +
   # scale_fill_gradient(limits=c(-3,3))+
-  theme_significance(base_size = 25) +
-  theme(axis.text=element_text(size=20),
-        legend.key.height = unit(0.5, "cm"),
+  theme_significance(base_size = 50) +
+  theme(legend.key.height = unit(0.5, "cm"),
         legend.key.width =  unit(2, "cm")) -> fig_sim
   # "BrBG"
   # scale_fill_gradient(limits=c(-,0.02))+
