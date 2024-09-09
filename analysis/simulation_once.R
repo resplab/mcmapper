@@ -177,27 +177,30 @@ write_rds(sim_results_detailed,"results/simulation_results_detailed_once.rds")
 
 sim_results_detailed <- read_rds("results/simulation_results_detailed_once.rds")
 
+to_math <- as_labeller(c(`mmm`="m-hat(m)",`ccc` = "c-hat(c)"),label_parsed)
+to_math <- as_labeller(c(`mmm`="1",`ccc` = "2"))
+
 ggplot(data=sim_results_detailed %>%
          mutate(rel_diff = ifelse(parameter=="Difference in prevalence",
                                   difference,
                                   difference),
                 parameter = ifelse(parameter == "Difference in prevalence",
-                                   "Difference in m",
-                                   "Difference in c")),
-                # parameter = factor(parameter,
-                #                    c("Difference in prevalence","Difference in c-statistic"),
-                #                    c("Difference in prevalence","Difference in c-statistic"))),
+                                   "mmm",
+                                   "ccc"),
+                parameter = factor(parameter,
+                                   levels=c("mmm","ccc"),
+                                   labels=c("mmm","ccc"))),
        aes(x=prev,y=c_stat,fill=rel_diff))+
   geom_tile() +
-  facet_grid(parameter~type)+
+  facet_grid(parameter~type,labeller = labeller(parameter = to_math)) +
   theme_classic() +
-  xlab("Expected m") +
-  ylab("Expected c") +
+  xlab("m") +
+  ylab("c") +
   # guides(fill=guide_legend(title="Relative Difference (%)"))+
   # scale_fill_continuous(name = "Difference")+
   scale_fill_gradient2(name = "") +
   # scale_fill_gradient(limits=c(-3,3))+
-  theme_significance(base_size = 50) +
+  theme_significance(base_size = 25) +
   theme(legend.key.height = unit(0.5, "cm"),
         legend.key.width =  unit(2, "cm")) -> fig_sim
   # "BrBG"
