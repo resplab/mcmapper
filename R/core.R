@@ -608,6 +608,7 @@ mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitn
     },
 
     "probitnorm"=mcmap_probitnorm(c(m,c)),
+
     {stop("Type is not recognized.")}
   )
 
