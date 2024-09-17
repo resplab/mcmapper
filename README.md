@@ -8,7 +8,9 @@
 
 The goal of mcmapper is to enable estimating the parameters of
 two-parameter distributions for risks (e.g., beta, logit-normal) based
-on the expected value and c-statistic of the distribution.
+on the expected value and c-statistic of the distribution. The theory
+behind this approach is explained in [Sadatsafavi et
+al](https://arxiv.org/abs/2409.09178).
 
 Some of the recent developments in predictive analytics, such as [new
 methods for sample size calculations for risk prediction
@@ -52,7 +54,7 @@ res
 #> [1] "logitnorm"
 #> 
 #> $value
-#>       mu.m      sigma 
+#>         mu      sigma 
 #> -0.3605462  1.1836304 
 #> 
 #> attr(,"class")

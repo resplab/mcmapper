@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of mcmapper is to enable estimating the parameters of two-parameter distributions for risks (e.g., beta, logit-normal) based on the expected value and c-statistic of the distribution.
+The goal of mcmapper is to enable estimating the parameters of two-parameter distributions for risks (e.g., beta, logit-normal) based on the expected value and c-statistic of the distribution. The theory behind this approach is explained in [Sadatsafavi et al](https://arxiv.org/abs/2409.09178).
 
 Some of the recent developments in predictive analytics, such as [new methods for sample size calculations for risk prediction models]( https://doi.org/10.1002/sim.9025), require knowing the distribution of predicted risks. However, original reports seldom provide such information. On the other hand, prediction model development and validation studies most often report the expected values of predicted or observed risks, and the c-statistic of the model for predicting the outcome. For a given family of distributions, one can use this package to recover the parameters of such a distribution.
 
