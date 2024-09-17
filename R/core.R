@@ -106,17 +106,17 @@ mcmap_generic <- function(target=c(m=0.25, c=0.75), CDF, integrate_controls=list
 
 
 
-#'@export
-plot.mcmapper_output <- function(mcmapper_output, CDF=F, bins=1000, ...)
-{
-  x <- (0:bins)/bins
-
-  strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
-
-  tmp <- as.list(c(NA,unname(mcmapper_output$value)))
-  tmp[[1]] <- x
-
-  y <- do.call(strFun,args=tmp)
-
-  plot(x,y,...)
-}
+#' #'@export
+#' plot.mcmapper_output <- function(mcmapper_output, CDF=F, bins=1000, ...)
+#' {
+#'   x <- (0:bins)/bins
+#'
+#'   strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
+#'
+#'   tmp <- as.list(c(NA,unname(mcmapper_output$value)))
+#'   tmp[[1]] <- x
+#'
+#'   y <- do.call(strFun,args=tmp)
+#'
+#'   plot(x,y,...)
+#' }

@@ -161,8 +161,27 @@ find_logitnorm_mu <- function(m,sigma)
 
 ########################################mcmappers
 
-
 #'@export
+mcmap_logitnorm <- function(target=c(m=0.25,c=0.75), method="", integrate_controls=list(), optim_controls=list())
+{
+  if(method=="")
+  {
+    return(mcmap_logitnorm_default(target, integrate_controls, optim_controls))
+  }
+
+  if(method=="meansolve")
+  {
+    return(mcmap_logitnorm_meansolve_uniroot(target=target, integrate_controls, optim_controls))
+  }
+
+  stop("The requested method is not supplied.")
+}
+
+
+
+
+
+
 mcmap_logitnorm_default <- function(target=c(m=0.25,c=0.75), integrate_controls=list(), optim_controls=list())
 {
   m <- target[1]
@@ -215,8 +234,7 @@ mcmap_logitnorm_default <- function(target=c(m=0.25,c=0.75), integrate_controls=
 
 
 #This one reduces the problem into two root-finding ones
-#'@export
-mcmap_logitnorm_meansolver <- function(target=c(m=0.25,c=0.75), integrate_controls=list(), optim_controls=list())
+mcmap_logitnorm_meansolve_optim <- function(target=c(m=0.25,c=0.75), integrate_controls=list(), optim_controls=list())
 {
   m <- target[1]
   c <- target[2]
@@ -232,7 +250,74 @@ mcmap_logitnorm_meansolver <- function(target=c(m=0.25,c=0.75), integrate_contro
 
   if(is.null(integrate_controls$lower)) integrate_controls$lower<-0
   if(is.null(integrate_controls$upper)) integrate_controls$upper<-1
-  integrate_controls$f <- function(x) {plogitnorm(x, find_logitnorm_mu(m, sigma), sigma)^2}
+  integrate_controls$f <- function(x, sigma) {plogitnorm(x, find_logitnorm_mu(m, sigma), sigma)^2}
+
+  f <- function(x)
+  {
+    f2 <- do.call(integrate, args=c(integrate_controls, x))$value
+    (f2-F2)^2
+  }
+
+  if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
+  if(is.null(optim_controls$method)) optim_controls$method <- "Brent"
+  if(is.null(optim_controls$lower)) optim_controls$lower <- 0.0001
+  if(is.null(optim_controls$upper)) optim_controls$upper <- 10
+  optim_controls$fn <- f
+  res <- do.call(optim, args=optim_controls)
+#
+#   if(is.null(optim_controls$interval))
+#   {
+#     interval <- c(0.1,1)
+#     repeat
+#     {
+#       if(g(interval[1])>0) break;
+#       interval[1] <- interval[1]/2
+#     }
+#     repeat
+#     {
+#       if(g(interval[2])<0) break;
+#       interval[1] <- interval[2]
+#       interval[2] <- interval[2]+1
+#     }
+#
+#     optim_controls$interval <- interval
+#   }
+
+  # optim_controls$interval <- c(0,1)
+  # #if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
+  # optim_controls$f <- f
+  # res <- do.call(uniroot, args=optim_controls)
+
+  sigma <- res$par[1]
+
+  if(res$convergence==0)
+    c(mu=find_logitnorm_mu(m,sigma), sigma=sigma)
+  else
+    NULL
+
+}
+
+
+
+
+
+mcmap_logitnorm_meansolve_uniroot <- function(target=c(m=0.25,c=0.75), integrate_controls=list(), optim_controls=list())
+{
+  m <- target[1]
+  c <- target[2]
+
+  if(m>0.5)
+  {
+    tmp <- mcmap_logitnorm_meansolver2(c(1-m,c), integrate_controls, optim_controls, interval)
+    return(c(-tmp[1],tmp[2]))
+  }
+
+  F1 <- 1-m
+  F2 <- 1- (2*c*m-(2*c-1)*m^2)
+
+  if(is.null(integrate_controls$lower)) integrate_controls$lower<-0
+  if(is.null(integrate_controls$upper)) integrate_controls$upper<-1
+  integrate_controls$f <- function(x, sigma) {plogitnorm(x, find_logitnorm_mu(m, sigma), sigma)^2}
 
   f <- function(x)
   {
@@ -242,7 +327,7 @@ mcmap_logitnorm_meansolver <- function(target=c(m=0.25,c=0.75), integrate_contro
 
   if(is.null(optim_controls$interval))
   {
-    interval <- c(0.1,1)
+    interval <- c(0.001,1)
     repeat
     {
       if(f(interval[1])>0) break;
@@ -258,14 +343,13 @@ mcmap_logitnorm_meansolver <- function(target=c(m=0.25,c=0.75), integrate_contro
     optim_controls$interval <- interval
   }
 
-  if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
-  optim_controls$fn <- f
+  #optim_controls$interval <- c(0,1)
+  #if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
+  optim_controls$f <- f
   res <- do.call(uniroot, args=optim_controls)
 
-  if(res$convergence==0)
-    c(mu=find_logitnorm_mu(m,sigma), sigma=sigma)
-  else
-    NULL
+  sigma <- res$root
 
+  c(mu=find_logitnorm_mu(m,sigma), sigma=sigma)
 }
 

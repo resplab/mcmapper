@@ -62,7 +62,6 @@ mcmap_beta_default <- function(target=c(m=0.25,c=0.75), integrate_controls=list(
 
 
 #Log-transformed alpha and beta
-#'@export
 mcmap_beta2 <- function(target=c(m=0.25,c=0.75), init=NULL)
 {
   m <- target[1]
