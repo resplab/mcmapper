@@ -1,11 +1,11 @@
 #'@export
-mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitnorm"), init=NULL)
+mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitnorm"))
 {
+  type <- match.arg(type)
   if(!is.vector(target) | length(target)!=2)
   {
     stop("Error: target should be a vector oftwo elements (m, c)")
   }
-
   if(is.null(names(target)))
   {
     m <- target[1]
@@ -19,7 +19,7 @@ mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitn
 
   if(m<=0 | m>=1 | c<=0.5 | c>=1)
   {
-    stop("Error: inadmissible value for m and/or c.")
+    stop("Error: inadmissible value(s) for m and/or c.")
   }
 
   if(abs(m-0.5)>0.499  | abs(c-0.75)>0.24)
@@ -39,7 +39,7 @@ mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitn
         if(abs(m-0.5)>0.49  | abs(c-0.75)>0.19)
         {
           message("Invoking 1D version of logitnorm mapper given the extrema parameter values.")
-          mcmap_logitnorm3(c(m,c))
+          mcmap_logitnorm(c(m,c), method="meansolve")
         }
         else
         {
@@ -106,17 +106,17 @@ mcmap_generic <- function(target=c(m=0.25, c=0.75), CDF, integrate_controls=list
 
 
 
-#' #'@export
-#' plot.mcmapper_output <- function(mcmapper_output, CDF=F, bins=1000, ...)
-#' {
-#'   x <- (0:bins)/bins
-#'
-#'   strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
-#'
-#'   tmp <- as.list(c(NA,unname(mcmapper_output$value)))
-#'   tmp[[1]] <- x
-#'
-#'   y <- do.call(strFun,args=tmp)
-#'
-#'   plot(x,y,...)
-#' }
+#'@export
+plot.mcmapper_output <- function(mcmapper_output, CDF=F, bins=1000, ...)
+{
+  x <- (0:bins)/bins
+
+  strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
+
+  tmp <- as.list(c(NA,unname(mcmapper_output$value)))
+  tmp[[1]] <- x
+
+  y <- do.call(strFun,args=tmp)
+
+  plot(x,y,...)
+}
