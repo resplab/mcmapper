@@ -211,7 +211,7 @@ mcmap_logitnorm_default <- function(target=c(m=0.25,c=0.75), integrate_controls=
     (f1-F1)^2+(f2-F2)^2
   }
 
-  if(is.null(optim_controls$par)) optim_controls$par<-c(0.5,1)
+  if(is.null(optim_controls$par)) optim_controls$par<-c(logit(m),0)
   if(is.null(optim_controls$method))
   {
     optim_controls$method <- "Nelder-Mead"
