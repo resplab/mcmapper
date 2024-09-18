@@ -79,15 +79,14 @@ mcmap_generic <- function(target=c(m=0.25, c=0.75), CDF, integrate_controls=list
 
   f <- function(x)
   {
-    #message(paste(x,collapse=","))
-    f1 <- do.call(integrate, args=c(integrate_controls, x[1], x[2]))$value
-    f2 <- do.call(integrate, args=c(integrate_controls2,x[1], x[2]))$value
+    f1 <- do.call(stats::integrate, args=c(integrate_controls, x[1], x[2]))$value
+    f2 <- do.call(stats::integrate, args=c(integrate_controls2,x[1], x[2]))$value
     (f1-F1)^2+(f2-F2)^2
   }
 
   if(is.null(optim_controls$par)) optim_controls$par<-c(0.5,1)
   optim_controls$fn <- f
-  res <- do.call(optim, args=optim_controls) #, control=list(trace=100))
+  res <- do.call(stats::optim, args=optim_controls) #, control=list(trace=100))
 
   if(res$convergence==0)
     res$par

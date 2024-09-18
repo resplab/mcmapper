@@ -24,7 +24,7 @@ mcmap_beta_default <- function(target=c(m=0.25,c=0.75), integrate_controls=list(
 
   if(m>0.5)
   {
-    tmp <- mcmap_beta(c(1-m,c), init)
+    tmp <- mcmap_beta_default(c(1-m,c), integrate_controls, optim_controls)
     return(c(tmp[2],tmp[1]))
   }
 
@@ -33,11 +33,11 @@ mcmap_beta_default <- function(target=c(m=0.25,c=0.75), integrate_controls=list(
 
   if(is.null(integrate_controls$lower)) integrate_controls$lower<-0
   if(is.null(integrate_controls$upper)) integrate_controls$upper<-1
-  integrate_controls$f <- function(x, alpha) {pbeta(x, alpha, alpha*(1-m)/m)^2}
+  integrate_controls$f <- function(x, alpha) {stats::pbeta(x, alpha, alpha*(1-m)/m)^2}
 
   f <- function(x)
   {
-    f2 <- do.call(integrate, args=c(integrate_controls, x))$value
+    f2 <- do.call(stats::integrate, args=c(integrate_controls, x))$value
     (f2-F2)^2
   }
 
@@ -46,7 +46,7 @@ mcmap_beta_default <- function(target=c(m=0.25,c=0.75), integrate_controls=list(
   if(is.null(optim_controls$lower)) optim_controls$lower <- 0.0001
   if(is.null(optim_controls$upper)) optim_controls$upper <- 10
   optim_controls$fn <- f
-  res <- do.call(optim, args=optim_controls)
+  res <- do.call(stats::optim, args=optim_controls)
 
   if(res$convergence==0)
     c(alpha=unname(res$par[1]), beta=unname(res$par[1]*(1-m)/m))
@@ -83,7 +83,7 @@ mcmap_beta2 <- function(target=c(m=0.25,c=0.75), init=NULL)
     #message(paste(x,collapse=","))
     L <- 0
     U <- 1
-    f2 <- integrate(function(x, ln_alpha) {pbeta(x, exp(ln_alpha), exp(ln_alpha)*(1-m)/m)^2}, L, U, ln_alpha=x)$value
+    f2 <- stats::integrate(function(x, ln_alpha) {stats::pbeta(x, exp(ln_alpha), exp(ln_alpha)*(1-m)/m)^2}, L, U, ln_alpha=x)$value
 
     (f2-F2)^2
   }
@@ -92,7 +92,7 @@ mcmap_beta2 <- function(target=c(m=0.25,c=0.75), init=NULL)
   {
     init <- c(0)
   }
-  res <- optim(init, f, method="Brent", lower=-c(10), upper=c(10)) #, control=list(trace=100))
+  res <- stats::optim(init, f, method="Brent", lower=-c(10), upper=c(10)) #, control=list(trace=100))
 
   if(res$convergence==0)
     c(alpha=exp(res$par[1]), beta=exp(res$par[1])*(1-m)/m)

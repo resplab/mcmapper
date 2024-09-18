@@ -4,13 +4,13 @@ expit <- function(x) {1/(1+exp(-x))}
 
 
 #'@export
-rlogitnorm <- function(n, mu, sigma) {1/(1+exp(-(rnorm(n,mu,sigma))))}
+rlogitnorm <- function(n, mu, sigma) {1/(1+exp(-(stats::rnorm(n,mu,sigma))))}
 #'@export
 dlogitnorm <- function(x, mu, sigma) {1/sigma/sqrt(2*pi)/x/(1-x)*exp(-(logit(x)-mu)^2/(2*sigma^2))}
 #'@export
-plogitnorm <- function(x, mu, sigma) {pnorm(logit(x),mu,sigma)}
+plogitnorm <- function(x, mu, sigma) {stats::pnorm(logit(x),mu,sigma)}
 #'@export
-qlogitnorm <- function(x, mu, sigma) {1/(1+exp(-(qnorm(x,mu,sigma))))}
+qlogitnorm <- function(x, mu, sigma) {1/(1+exp(-(stats::qnorm(x,mu,sigma))))}
 
 
 
@@ -89,7 +89,7 @@ elogitnorm <- function(mu,sigma)
   steps <- floor(-mu/sigma^2)
   if(steps>1000)
   {
-    return(1-integrate(plogitnorm,0,1,mu=mu,sigma=sigma)$value)
+    return(1-stats::integrate(stats::plogitnorm,0,1,mu=mu,sigma=sigma)$value)
   }
   else
   {
@@ -109,7 +109,7 @@ find_logitnorm_modes <- function(mu, sigma)
 
   if(delta<0)
   {
-    res <- uniroot(f,interval=c(0,1))$root
+    res <- stats::uniroot(f,interval=c(0,1))$root
   }
   else
   {
@@ -121,7 +121,7 @@ find_logitnorm_modes <- function(mu, sigma)
     {
       if(sign(f(y[i-1]))!=sign(f(y[i])))
       {
-        res <- c(res, uniroot(f,interval=c(y[i-1],y[i]))$root)
+        res <- c(res, stats::uniroot(f,interval=c(y[i-1],y[i]))$root)
       }
     }
   }
@@ -151,7 +151,7 @@ find_logitnorm_mu <- function(m,sigma)
     }
 
     interval <- c(L,logit(m))
-    out[i] <- uniroot(function(x,s) {elogitnorm(x,s)-m}, interval, sigma[i])$root
+    out[i] <- stats::uniroot(function(x,s) {elogitnorm(x,s)-m}, interval, sigma[i])$root
   }
   out
 }
@@ -189,7 +189,7 @@ mcmap_logitnorm_default <- function(target=c(m=0.25,c=0.75), integrate_controls=
 
   if(m>0.5)
   {
-    tmp <- mcmap_logitnorm(c(1-m,c), init)
+    tmp <- mcmap_logitnorm_default(c(1-m,c), integrate_controls, optim_controls)
     if(is.null(tmp)) return(NULL);
     return(c(-tmp[1],tmp[2]))
   }
@@ -206,8 +206,8 @@ mcmap_logitnorm_default <- function(target=c(m=0.25,c=0.75), integrate_controls=
 
   f <- function(x)
   {
-    f1 <- do.call(integrate, args=c(integrate_controls, x[1], exp(x[2])))$value
-    f2 <- do.call(integrate, args=c(integrate_controls2,x[1], exp(x[2])))$value
+    f1 <- do.call(stats::integrate, args=c(integrate_controls, x[1], exp(x[2])))$value
+    f2 <- do.call(stats::integrate, args=c(integrate_controls2,x[1], exp(x[2])))$value
     (f1-F1)^2+(f2-F2)^2
   }
 
@@ -219,7 +219,7 @@ mcmap_logitnorm_default <- function(target=c(m=0.25,c=0.75), integrate_controls=
   }
 
   optim_controls$fn <- f
-  res <- do.call(optim, args=optim_controls) #, control=list(trace=100))
+  res <- do.call(stats::optim, args=optim_controls) #, control=list(trace=100))
 
   if(res$convergence==0)
     c(mu=unname(res$par[1]), sigma=unname(exp(res$par[2])))
@@ -263,31 +263,7 @@ mcmap_logitnorm_meansolve_optim <- function(target=c(m=0.25,c=0.75), integrate_c
   if(is.null(optim_controls$lower)) optim_controls$lower <- 0.0001
   if(is.null(optim_controls$upper)) optim_controls$upper <- 10
   optim_controls$fn <- f
-  res <- do.call(optim, args=optim_controls)
-#
-#   if(is.null(optim_controls$interval))
-#   {
-#     interval <- c(0.1,1)
-#     repeat
-#     {
-#       if(g(interval[1])>0) break;
-#       interval[1] <- interval[1]/2
-#     }
-#     repeat
-#     {
-#       if(g(interval[2])<0) break;
-#       interval[1] <- interval[2]
-#       interval[2] <- interval[2]+1
-#     }
-#
-#     optim_controls$interval <- interval
-#   }
-
-  # optim_controls$interval <- c(0,1)
-  # #if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
-  # optim_controls$f <- f
-  # res <- do.call(uniroot, args=optim_controls)
-
+  res <- do.call(stats::optim, args=optim_controls)
   sigma <- res$par[1]
 
   if(res$convergence==0)
@@ -346,7 +322,7 @@ mcmap_logitnorm_meansolve_uniroot <- function(target=c(m=0.25,c=0.75), integrate
   #optim_controls$interval <- c(0,1)
   #if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
   optim_controls$f <- f
-  res <- do.call(uniroot, args=optim_controls)
+  res <- do.call(stats::uniroot, args=optim_controls)
 
   sigma <- res$root
 

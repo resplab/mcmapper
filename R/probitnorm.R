@@ -1,10 +1,10 @@
 
 #'@export
-dprobitnorm <- function(x, mu, sigma) {dnorm(qnorm(x),mu,sigma)/dnorm(qnorm(x))}
+dprobitnorm <- function(x, mu, sigma) {stats::dnorm(stats::qnorm(x),mu,sigma)/stats::dnorm(stats::qnorm(x))}
 #'@export
-pprobitnorm <- function(x, mu, sigma) {pnorm(qnorm(x),mu,sigma)}
+pprobitnorm <- function(x, mu, sigma) {stats::pnorm(stats::qnorm(x),mu,sigma)}
 #'@export
-rprobitnorm <- function(n,mu,sigma){pnorm(rnorm(n,mu,sigma))}
+rprobitnorm <- function(n,mu,sigma){stats::pnorm(stats::rnorm(n,mu,sigma))}
 
 
 
@@ -82,7 +82,7 @@ mcmap_probitnorm2 <- function(target=c(m=0.25,c=0.75), init=NULL)
     #message(paste(x,collapse=","))
     L <- 0
     U <- 1
-    f2 <- integrate(function(x, mu) {pprobitnorm(x, mu, sqrt((mu/qnorm(m))^2-1))^2}, L, U, mu=x)$value
+    f2 <- stats::integrate(function(x, mu) {pprobitnorm(x, mu, sqrt((mu/qnorm(m))^2-1))^2}, L, U, mu=x)$value
 
     (f2-F2)^2
   }
