@@ -60,10 +60,3 @@ res
 #> attr(,"class")
 #> [1] "mcmapper_output"
 ```
-
-``` r
-
-plot(res, type='l')
-```
-
-<img src="man/figures/README-example-1.png" width="100%" />
