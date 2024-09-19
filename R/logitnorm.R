@@ -2,13 +2,24 @@ logit <- function(x) {log(x/(1-x))}
 expit <- function(x) {1/(1+exp(-x))}
 
 
-
-#'@export
+#' Functions related to logit-normal distribution.
+#' @description
+#' Functions related to logit-normal distribution.
+#' @name logitnorm
+#' @param n Number of draws requested (for rlogitnorm)
+#' @param x For density, CDF, and quantile functions
+#' @param mu Mean of the logit-transformed variable
+#' @param sigma SD of the logit-transformed variable
+#' @return Depends on the function
+#' @export
 rlogitnorm <- function(n, mu, sigma) {1/(1+exp(-(stats::rnorm(n,mu,sigma))))}
+#' @rdname logitnorm
 #'@export
 dlogitnorm <- function(x, mu, sigma) {1/sigma/sqrt(2*pi)/x/(1-x)*exp(-(logit(x)-mu)^2/(2*sigma^2))}
+#' @rdname logitnorm
 #'@export
 plogitnorm <- function(x, mu, sigma) {stats::pnorm(logit(x),mu,sigma)}
+#' @rdname logitnorm
 #'@export
 qlogitnorm <- function(x, mu, sigma) {1/(1+exp(-(stats::qnorm(x,mu,sigma))))}
 
@@ -82,14 +93,14 @@ elogitnorm_nonrecursive <- function(mu, sigma)
 }
 
 
-#'@export
+
 elogitnorm <- function(mu,sigma)
 {
   #message(mu,",",sigma)
   steps <- floor(-mu/sigma^2)
   if(steps>1000)
   {
-    return(1-stats::integrate(stats::plogitnorm,0,1,mu=mu,sigma=sigma)$value)
+    return(1-stats::integrate(plogitnorm,0,1,mu=mu,sigma=sigma)$value)
   }
   else
   {
@@ -161,7 +172,19 @@ find_logitnorm_mu <- function(m,sigma)
 
 ########################################mcmappers
 
-#'@export
+
+#' Mapper function for logit-normal distribution
+#' @description
+#' Maps a pair of mean and c-statistic value to the parameters of a logit-normal distribution
+#'
+#' @param target A vector of size 2. The first element is mean and the second element is c-statistic.
+#' @param method Either empty string, which invoked the default method; or "meansolve" which uses two 1-dimensional optimization approach.
+#' @param integrate_controls (optional): parameters to be passed to integrate()
+#' @param optim_controls (optional): parameters to be passed to optim()
+#' @return A vector of size two that contains the distribution parameters
+#' @examples
+#' mcmap_logitnorm(c(0.1, 0.75))
+#' @export
 mcmap_logitnorm <- function(target=c(m=0.25,c=0.75), method="", integrate_controls=list(), optim_controls=list())
 {
   if(method=="")
@@ -241,7 +264,7 @@ mcmap_logitnorm_meansolve_optim <- function(target=c(m=0.25,c=0.75), integrate_c
 
   if(m>0.5)
   {
-    tmp <- mcmap_logitnorm_meansolver(c(1-m,c), integrate_controls, optim_controls, interval)
+    tmp <- mcmap_logitnorm_meansolve_optim(c(1-m,c), integrate_controls, optim_controls)
     return(c(-tmp[1],tmp[2]))
   }
 
@@ -254,7 +277,7 @@ mcmap_logitnorm_meansolve_optim <- function(target=c(m=0.25,c=0.75), integrate_c
 
   f <- function(x)
   {
-    f2 <- do.call(integrate, args=c(integrate_controls, x))$value
+    f2 <- do.call(stats::integrate, args=c(integrate_controls, x))$value
     (f2-F2)^2
   }
 
@@ -284,7 +307,7 @@ mcmap_logitnorm_meansolve_uniroot <- function(target=c(m=0.25,c=0.75), integrate
 
   if(m>0.5)
   {
-    tmp <- mcmap_logitnorm_meansolver2(c(1-m,c), integrate_controls, optim_controls, interval)
+    tmp <- mcmap_logitnorm_meansolve_uniroot(c(1-m,c), integrate_controls, optim_controls)
     return(c(-tmp[1],tmp[2]))
   }
 
@@ -297,7 +320,7 @@ mcmap_logitnorm_meansolve_uniroot <- function(target=c(m=0.25,c=0.75), integrate
 
   f <- function(x)
   {
-    f2 <- do.call(integrate, args=c(integrate_controls, x))$value
+    f2 <- do.call(stats::integrate, args=c(integrate_controls, x))$value
     (f2-F2)
   }
 

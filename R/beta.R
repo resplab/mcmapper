@@ -1,7 +1,16 @@
-
-
-#'@export
-mcmap_beta <- function(target=c(m=0.25,c=0.75), method="", integrate_controls=list(), optim_controls=list())
+#' Mapper function for beta distribution
+#' @description
+#' Maps a pair of mean and c-statistic value to the parameters of a beta distribution
+#'
+#' @param target A vector of size 2. The first element is mean and the second element is c-statistic.
+#' @param method Not implemented for this funciton yet; leave as empty string.
+#' @param integrate_controls (optional): parameters to be passed to integrate()
+#' @param optim_controls (optional): parameters to be passed to optim()
+#' @return A vector of size two that contains the distribution parameters
+#' @examples
+#' mcmap_beta(c(0.1, 0.75))
+#' @export
+mcmap_beta <- function(target, method="", integrate_controls=list(), optim_controls=list())
 {
   if(method=="")
   {
@@ -12,6 +21,7 @@ mcmap_beta <- function(target=c(m=0.25,c=0.75), method="", integrate_controls=li
     stop("The requested method is not supplied.")
   }
 }
+
 
 
 

@@ -1,5 +1,14 @@
+#' The main mapper function
+#' @description
+#' Maps a pair of mean and c-statistic value to the parameters of a specified distribution for risk
+#'
+#' @param target A vector of size 2. The first element is mean and the second element is c-statistic.
+#' @param type One of "beta", "logitnorm", "probitnorm". Loosy matching is enabled (so "b" will be mapped to "beta").
+#' @return An object of class mcmapper. The "value" component returns the parameter. Any warning or error from the integration or gradient ascent will also be returned in the "info" component.
+#' @examples
+#' mcmap(c(0.1, 0.75), "beta")
 #'@export
-mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitnorm"))
+mcmap <- function(target, type=c("beta", "logitnorm", "probitnorm"))
 {
   type <- match.arg(type)
   if(!is.vector(target) | length(target)!=2)
@@ -61,9 +70,19 @@ mcmap <- function(target=c(m=0.75, c=0.80), type=c("beta", "logitnorm", "probitn
 
 
 
-
+#' A generic mapper function
+#' @description
+#' Maps a pair of mean and c-statistic value to the parameters of an unspecified distribution that is indexed by two parameters
+#'
+#' @param target A vector of size 2. The first element is mean and the second element is c-statistic.
+#' @param CDF Cumulative distribution function of an unnspecified distribution. The CDF must be indexed by two parameters.
+#' @param integrate_controls (optional): parameters to be passed to integrate()
+#' @param optim_controls (optional): parameters to be passed to optim()
+#' @return A vector of size two that contains the distribution parameters
+#' @examples
+#' mcmap_generic(c(0.1, 0.75), pbeta)
 #'@export
-mcmap_generic <- function(target=c(m=0.25, c=0.75), CDF, integrate_controls=list(), optim_controls=list())
+mcmap_generic <- function(target, CDF, integrate_controls=list(), optim_controls=list())
 {
   m <- target[1]
   c <- target[2]
@@ -89,7 +108,7 @@ mcmap_generic <- function(target=c(m=0.25, c=0.75), CDF, integrate_controls=list
   res <- do.call(stats::optim, args=optim_controls) #, control=list(trace=100))
 
   if(res$convergence==0)
-    res$par
+    unname(res$par)
   else
     NULL
 }
@@ -105,17 +124,17 @@ mcmap_generic <- function(target=c(m=0.25, c=0.75), CDF, integrate_controls=list
 
 
 
-#'@export
-plot.mcmapper_output <- function(mcmapper_output, CDF=F, bins=1000, ...)
-{
-  x <- (0:bins)/bins
-
-  strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
-
-  tmp <- as.list(c(NA,unname(mcmapper_output$value)))
-  tmp[[1]] <- x
-
-  y <- do.call(strFun,args=tmp)
-
-  plot(x,y,...)
-}
+##'@export
+# plot.mcmapper_output <- function(mcmapper_output, CDF=F, bins=1000, ...)
+# {
+#   x <- (0:bins)/bins
+#
+#   strFun <- paste0(ifelse(CDF,"p","d"), mcmapper_output$type)
+#
+#   tmp <- as.list(c(NA,unname(mcmapper_output$value)))
+#   tmp[[1]] <- x
+#
+#   y <- do.call(strFun,args=tmp)
+#
+#   plot(x,y,...)
+# }
