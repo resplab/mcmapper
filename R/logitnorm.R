@@ -194,7 +194,7 @@ mcmap_logitnorm <- function(target=c(m=0.25,c=0.75), method="", integrate_contro
 
   if(method=="meansolve")
   {
-    return(mcmap_logitnorm_meansolve_uniroot(target=target, integrate_controls, optim_controls))
+    return(mcmap_logitnorm_meansolve_optim(target=target, integrate_controls, optim_controls))
   }
 
   stop("The requested method is not supplied.")

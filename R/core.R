@@ -33,7 +33,7 @@ mcmap <- function(target, type=c("beta", "logitnorm", "probitnorm"))
 
   if(abs(m-0.5)>0.499  | abs(c-0.75)>0.24)
   {
-    warning("Extreme values for parameters are requested. The algorithms might not be reliable. Check the results (e.g., via simulation).")
+    message("Extreme values for parameters are requested. The algorithms might not be reliable. Check the results (e.g., via simulation).")
   }
 
   out <- list(type=type)
