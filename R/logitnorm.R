@@ -281,9 +281,9 @@ mcmap_logitnorm_meansolve_optim <- function(target=c(m=0.25,c=0.75), integrate_c
     (f2-F2)^2
   }
 
-  if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
+  if(is.null(optim_controls$par)) optim_controls$par <- 0.5 #sigma
   if(is.null(optim_controls$method)) optim_controls$method <- "Brent"
-  if(is.null(optim_controls$lower)) optim_controls$lower <- 0.0001
+  if(is.null(optim_controls$lower)) optim_controls$lower <- 0.00001
   if(is.null(optim_controls$upper)) optim_controls$upper <- 10
   optim_controls$fn <- f
   res <- do.call(stats::optim, args=optim_controls)
@@ -299,56 +299,56 @@ mcmap_logitnorm_meansolve_optim <- function(target=c(m=0.25,c=0.75), integrate_c
 
 
 
-
-mcmap_logitnorm_meansolve_uniroot <- function(target=c(m=0.25,c=0.75), integrate_controls=list(), optim_controls=list())
-{
-  m <- target[1]
-  c <- target[2]
-
-  if(m>0.5)
-  {
-    tmp <- mcmap_logitnorm_meansolve_uniroot(c(1-m,c), integrate_controls, optim_controls)
-    return(c(-tmp[1],tmp[2]))
-  }
-
-  F1 <- 1-m
-  F2 <- 1- (2*c*m-(2*c-1)*m^2)
-
-  if(is.null(integrate_controls$lower)) integrate_controls$lower<-0
-  if(is.null(integrate_controls$upper)) integrate_controls$upper<-1
-  integrate_controls$f <- function(x, sigma) {plogitnorm(x, find_logitnorm_mu(m, sigma), sigma)^2}
-
-  f <- function(x)
-  {
-    f2 <- do.call(stats::integrate, args=c(integrate_controls, x))$value
-    (f2-F2)
-  }
-
-  if(is.null(optim_controls$interval))
-  {
-    interval <- c(0.001,1)
-    repeat
-    {
-      if(f(interval[1])>0) break;
-      interval[1] <- interval[1]/2
-    }
-    repeat
-    {
-      if(f(interval[2])<0) break;
-      interval[1] <- interval[2]
-      interval[2] <- interval[2]+1
-    }
-
-    optim_controls$interval <- interval
-  }
-
-  #optim_controls$interval <- c(0,1)
-  #if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
-  optim_controls$f <- f
-  res <- do.call(stats::uniroot, args=optim_controls)
-
-  sigma <- res$root
-
-  c(mu=find_logitnorm_mu(m,sigma), sigma=sigma)
-}
-
+#
+# mcmap_logitnorm_meansolve_uniroot <- function(target=c(m=0.25,c=0.75), integrate_controls=list(), optim_controls=list())
+# {
+#   m <- target[1]
+#   c <- target[2]
+#
+#   if(m>0.5)
+#   {
+#     tmp <- mcmap_logitnorm_meansolve_uniroot(c(1-m,c), integrate_controls, optim_controls)
+#     return(c(-tmp[1],tmp[2]))
+#   }
+#
+#   F1 <- 1-m
+#   F2 <- 1- (2*c*m-(2*c-1)*m^2)
+#
+#   if(is.null(integrate_controls$lower)) integrate_controls$lower<-0
+#   if(is.null(integrate_controls$upper)) integrate_controls$upper<-1
+#   integrate_controls$f <- function(x, sigma) {plogitnorm(x, find_logitnorm_mu(m, sigma), sigma)^2}
+#
+#   f <- function(x)
+#   {
+#     f2 <- do.call(stats::integrate, args=c(integrate_controls, x))$value
+#     (f2-F2)
+#   }
+#
+#   if(is.null(optim_controls$interval))
+#   {
+#     interval <- c(0.001,1)
+#     repeat
+#     {
+#       if(f(interval[1])>0) break;
+#       interval[1] <- interval[1]/2
+#     }
+#     repeat
+#     {
+#       if(f(interval[2])<0) break;
+#       interval[1] <- interval[2]
+#       interval[2] <- interval[2]+1
+#     }
+#
+#     optim_controls$interval <- interval
+#   }
+#
+#   #optim_controls$interval <- c(0,1)
+#   #if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
+#   optim_controls$f <- f
+#   res <- do.call(stats::uniroot, args=optim_controls)
+#
+#   sigma <- res$root
+#
+#   c(mu=find_logitnorm_mu(m,sigma), sigma=sigma)
+# }
+#
