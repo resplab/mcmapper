@@ -54,7 +54,7 @@ mcmap_beta_default <- function(target=c(m=0.25,c=0.75), integrate_controls=list(
   if(is.null(optim_controls$par)) optim_controls$par <- 1 #sigma
   if(is.null(optim_controls$method)) optim_controls$method <- "Brent"
   if(is.null(optim_controls$lower)) optim_controls$lower <- 0.0001
-  if(is.null(optim_controls$upper)) optim_controls$upper <- 1000
+  if(is.null(optim_controls$upper)) optim_controls$upper <- 10000
   optim_controls$fn <- f
   res <- do.call(stats::optim, args=optim_controls)
 
