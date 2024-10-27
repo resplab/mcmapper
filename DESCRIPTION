@@ -1,12 +1,12 @@
 Package: mcmapper
-Title: What the Package Does (One Line, Title Case)
+Title: Mapping First Moment and C-statistic to the Parameters of Distributions for Risk
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Mohsen", "Sadatsafavi", , "mohsen.sadatsafavi@ubc.ca", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0419-7862"))
+Description: Tools for mapping the first moment and c-statistic to the parameters of common distributions for risk. This provides a series of numerical methods for extracting parameters of the distributions for risks based on knowing the expected value and c-statistics (e.g., from a published report on the performance of a risk prediction model). This package implements the methodology described in Sadatsafavi et al (2024) <doi:10.48550/arXiv.2409.09178>. The core of the package is mcmap(), which takes a pair of (mean, c-statistic) and the distribution type requested. This is a generic interface to more customized functions (mcmap_beta, mcmap_logitnorm, mcmap_probitnorm) for specific distributions. 
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
+VignetteBuilder: knitr 
