@@ -42,7 +42,7 @@ library(mcmapper)
 
 res <- mcmap(c(m=0.43, c=0.77), type="logitnorm")
 
-res
+print(res)
 
 ```
 
