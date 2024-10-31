@@ -1,8 +1,8 @@
-Dear CRAN team, this is the very first submission of this package. 
+Comment from reviewer: 
 
-Regards,
-Mohsen Sadatsafavi 
+Please do not start the description with "This package", "Tools for", package name, title or similar. Please add () behind all function names in the description texts (DESCRIPTION file). e.g: --> mcmap_beta(), mcmap_logitnorm(), ..."
 
+Response: Thanks for reviewing. This is now corrected.
 
 ## R CMD check results
 
