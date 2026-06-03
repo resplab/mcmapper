@@ -46,21 +46,6 @@ elogitnorm_base <- function(mu, sigma, N=100)
 }
 
 
-elogitnorm_recursive <- function(mu, sigma)
-{
-  if(mu>0)
-  {
-    return(1-elogitnorm_recursive(-mu,sigma))
-  }
-  if(abs(-mu-sigma^2)<abs(mu))
-  {
-    return(exp(mu+sigma^2/2)*elogitnorm_recursive(-mu-sigma^2,sigma))
-  }
-
-  elogitnorm_base(mu, sigma)
-}
-
-
 #standard
 elogitnorm_nonrecursive <- function(mu, sigma)
 {
@@ -94,7 +79,8 @@ elogitnorm_nonrecursive <- function(mu, sigma)
 
 
 
-elogitnorm <- function(mu,sigma)
+# Scalar workhorse: mean of a single logit-normal (mu, sigma).
+elogitnorm_scalar <- function(mu,sigma)
 {
   #message(mu,",",sigma)
   steps <- floor(-mu/sigma^2)
@@ -106,6 +92,28 @@ elogitnorm <- function(mu,sigma)
   {
     return(elogitnorm_nonrecursive(mu,sigma))
   }
+}
+
+
+#' @rdname logitnorm
+#' @details
+#' `elogitnorm()` returns the mean (expected value) of the logit-normal
+#' distribution, i.e. `E[1/(1+exp(-Z))]` for `Z ~ Normal(mu, sigma)`. The integral
+#' has no closed form; it is evaluated by an accurate series expansion (with a
+#' numerical-integration fallback in extreme cases). Vectorised over `mu` and
+#' `sigma`, which are recycled to a common length.
+#' @examples
+#' elogitnorm(0, 1)            # 0.5, by symmetry
+#' elogitnorm(c(-1, 0, 1), 1)  # vectorised over mu
+#' @export
+elogitnorm <- function(mu, sigma)
+{
+  n <- max(length(mu), length(sigma))
+  mu <- rep_len(mu, n)
+  sigma <- rep_len(sigma, n)
+  out <- numeric(n)
+  for(i in seq_len(n)) out[i] <- elogitnorm_scalar(mu[i], sigma[i])
+  out
 }
 
 
@@ -157,12 +165,12 @@ find_logitnorm_mu <- function(m,sigma)
     L <- logit(m)-sigma[i]
     repeat
     {
-      if(elogitnorm(L,sigma[i])<m) break;
+      if(elogitnorm_scalar(L,sigma[i])<m) break;
       L <- L-sigma[i]
     }
 
     interval <- c(L,logit(m))
-    out[i] <- stats::uniroot(function(x,s) {elogitnorm(x,s)-m}, interval, sigma[i])$root
+    out[i] <- stats::uniroot(function(x,s) {elogitnorm_scalar(x,s)-m}, interval, sigma[i])$root
   }
   out
 }

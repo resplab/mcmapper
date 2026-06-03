@@ -14,7 +14,7 @@ mcmap_probitnorm(
 \arguments{
 \item{target}{A vector of size 2. The first element is mean and the second element is c-statistic.}
 
-\item{method}{Fir compatibilty with other functions. Use "" for now (alternative optimization methods might be implemented in the future)}
+\item{method}{Fir compatibility with other functions. Use "" for now (alternative optimization methods might be implemented in the future)}
 
 \item{integrate_controls}{(optional): parameters to be passed to integrate()}
 

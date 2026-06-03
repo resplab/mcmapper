@@ -2,6 +2,8 @@
 
 export(dlogitnorm)
 export(dprobitnorm)
+export(elogitnorm)
+export(eprobitnorm)
 export(mcmap)
 export(mcmap_beta)
 export(mcmap_generic)

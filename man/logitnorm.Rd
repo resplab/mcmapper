@@ -6,6 +6,7 @@
 \alias{dlogitnorm}
 \alias{plogitnorm}
 \alias{qlogitnorm}
+\alias{elogitnorm}
 \title{Functions related to logit-normal distribution.}
 \usage{
 rlogitnorm(n, mu, sigma)
@@ -15,6 +16,8 @@ dlogitnorm(x, mu, sigma)
 plogitnorm(x, mu, sigma)
 
 qlogitnorm(x, mu, sigma)
+
+elogitnorm(mu, sigma)
 }
 \arguments{
 \item{n}{Number of draws requested (for rlogitnorm)}
@@ -30,4 +33,15 @@ Depends on the function
 }
 \description{
 Functions related to logit-normal distribution.
+}
+\details{
+\code{elogitnorm()} returns the mean (expected value) of the logit-normal
+distribution, i.e. \code{E[1/(1+exp(-Z))]} for \code{Z ~ Normal(mu, sigma)}. The integral
+has no closed form; it is evaluated by an accurate series expansion (with a
+numerical-integration fallback in extreme cases). Vectorised over \code{mu} and
+\code{sigma}, which are recycled to a common length.
+}
+\examples{
+elogitnorm(0, 1)            # 0.5, by symmetry
+elogitnorm(c(-1, 0, 1), 1)  # vectorised over mu
 }

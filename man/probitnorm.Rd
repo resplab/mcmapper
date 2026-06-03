@@ -6,6 +6,7 @@
 \alias{pprobitnorm}
 \alias{rprobitnorm}
 \alias{qprobitnorm}
+\alias{eprobitnorm}
 \title{Functions related to probit-normal distribution.}
 \usage{
 dprobitnorm(x, mu, sigma)
@@ -15,6 +16,8 @@ pprobitnorm(x, mu, sigma)
 rprobitnorm(n, mu, sigma)
 
 qprobitnorm(x, mu, sigma)
+
+eprobitnorm(mu, sigma)
 }
 \arguments{
 \item{x}{For density, CDF, and quantile functions}
@@ -30,4 +33,14 @@ Depends on the function
 }
 \description{
 Functions related to probit-normal distribution.
+}
+\details{
+\code{eprobitnorm()} returns the mean (expected value) of the probit-normal
+distribution, i.e. \code{E[pnorm(Z)]} for \code{Z ~ Normal(mu, sigma)}. Unlike the
+logit-normal case this has the closed form \code{pnorm(mu / sqrt(1 + sigma^2))}.
+Vectorised over \code{mu} and \code{sigma}.
+}
+\examples{
+eprobitnorm(0, 1)            # 0.5, by symmetry
+eprobitnorm(c(-1, 0, 1), 1)  # vectorised over mu
 }

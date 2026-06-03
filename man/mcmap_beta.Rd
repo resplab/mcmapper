@@ -14,7 +14,7 @@ mcmap_beta(
 \arguments{
 \item{target}{A vector of size 2. The first element is mean and the second element is c-statistic.}
 
-\item{method}{Not implemented for this funciton yet; leave as empty string.}
+\item{method}{Not implemented for this function yet; leave as empty string.}
 
 \item{integrate_controls}{(optional): parameters to be passed to integrate()}
 

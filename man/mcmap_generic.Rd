@@ -14,7 +14,7 @@ mcmap_generic(
 \arguments{
 \item{target}{A vector of size 2. The first element is mean and the second element is c-statistic.}
 
-\item{CDF}{Cumulative distribution function of an unnspecified distribution. The CDF must be indexed by two parameters.}
+\item{CDF}{Cumulative distribution function of an unspecified distribution. The CDF must be indexed by two parameters.}
 
 \item{integrate_controls}{(optional): parameters to be passed to integrate()}
 

@@ -1,6 +1,6 @@
 Package: mcmapper
 Title: Mapping First Moment and C-Statistic to the Parameters of Distributions for Risk
-Version: 0.0.11
+Version: 0.0.12
 Authors@R: 
     person("Mohsen", "Sadatsafavi", , "mohsen.sadatsafavi@ubc.ca", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0419-7862"))
@@ -8,5 +8,7 @@ Description: Provides a series of numerical methods for extracting parameters of
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
-
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+RoxygenNote: 7.3.3

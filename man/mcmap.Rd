@@ -9,7 +9,7 @@ mcmap(target, type = c("beta", "logitnorm", "probitnorm"))
 \arguments{
 \item{target}{A vector of size 2. The first element is mean and the second element is c-statistic.}
 
-\item{type}{One of "beta", "logitnorm", "probitnorm". Loosy matching is enabled (so "b" will be mapped to "beta").}
+\item{type}{One of "beta", "logitnorm", "probitnorm". Loose matching is enabled (so "b" will be mapped to "beta").}
 }
 \value{
 An object of class mcmapper. The "value" component returns the parameter. Any warning or error from the integration or gradient ascent will also be returned in the "info" component.
