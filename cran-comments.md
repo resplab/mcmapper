@@ -12,9 +12,10 @@ details.
 
 ## Test environments
 
-* Local: Windows, R 4.5.2 -- OK
+* Local: Windows, R 4.6.1
 * win-builder (devel and release) -- OK
 
 ## Reverse dependencies
 
-There are no reverse dependencies.
+We checked the one reverse dependency, bayespmtools (same maintainer), against
+this version and saw no new problems.

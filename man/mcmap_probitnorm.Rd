@@ -14,7 +14,7 @@ mcmap_probitnorm(
 \arguments{
 \item{target}{A vector of size 2. The first element is mean and the second element is c-statistic.}
 
-\item{method}{Fir compatibility with other functions. Use "" for now (alternative optimization methods might be implemented in the future)}
+\item{method}{For compatibility with other functions. Use "" for now (alternative optimization methods might be implemented in the future)}
 
 \item{integrate_controls}{(optional): parameters to be passed to integrate()}
 
@@ -24,7 +24,7 @@ mcmap_probitnorm(
 A vector of size two that contains the distribution parameters
 }
 \description{
-Maps a pair of mean and c-statistic value to the parameters of a pobit-normal distribution
+Maps a pair of mean and c-statistic value to the parameters of a probit-normal distribution
 }
 \examples{
 mcmap_probitnorm(c(0.1, 0.75))

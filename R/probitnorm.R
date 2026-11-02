@@ -43,10 +43,10 @@ eprobitnorm <- function(mu, sigma) {
 
 #' Mapper function for probit-normal distribution
 #' @description
-#' Maps a pair of mean and c-statistic value to the parameters of a pobit-normal distribution
+#' Maps a pair of mean and c-statistic value to the parameters of a probit-normal distribution
 #'
 #' @param target A vector of size 2. The first element is mean and the second element is c-statistic.
-#' @param method Fir compatibility with other functions. Use "" for now (alternative optimization methods might be implemented in the future)
+#' @param method For compatibility with other functions. Use "" for now (alternative optimization methods might be implemented in the future)
 #' @param integrate_controls (optional): parameters to be passed to integrate()
 #' @param optim_controls (optional): parameters to be passed to optim()
 #' @return A vector of size two that contains the distribution parameters
