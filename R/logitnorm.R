@@ -250,12 +250,28 @@ mcmap_logitnorm_default <- function(target=c(m=0.25,c=0.75), integrate_controls=
   }
 
   optim_controls$fn <- f
-  res <- do.call(stats::optim, args=optim_controls) #, control=list(trace=100))
 
-  if(res$convergence==0)
-    c(mu=unname(res$par[1]), sigma=unname(exp(res$par[2])))
-  else
-    NULL
+  # Nelder-Mead sizes its initial simplex at 10% of the largest |starting value|.
+  # For m near 0.5, logit(m) is near 0, so the simplex is tiny and optim() either
+  # stalls or stops at the start while reporting convergence. A fit is therefore
+  # accepted only if it reproduces (m, c); otherwise we restart from (0, 0),
+  # which gets optim()'s default step of 0.1.
+  for(par in list(optim_controls$par, c(0,0)))
+  {
+    optim_controls$par <- par
+    res <- do.call(stats::optim, args=optim_controls) #, control=list(trace=100))
+    if(res$convergence!=0) next
+
+    mu <- unname(res$par[1])
+    sigma <- unname(exp(res$par[2]))
+    m_hat <- 1-do.call(stats::integrate, args=c(integrate_controls, mu, sigma))$value
+    F2_hat <- do.call(stats::integrate, args=c(integrate_controls2, mu, sigma))$value
+    c_hat <- (1-m_hat^2-F2_hat)/(2*m_hat*(1-m_hat))
+    if(max(abs(m_hat-m), abs(c_hat-c))<1e-3) return(c(mu=mu, sigma=sigma))
+  }
+
+  warning("Could not find logit-normal parameters that reproduce the target (m, c); returning NULL. Try method=\"meansolve\".", call.=FALSE)
+  NULL
 }
 
 

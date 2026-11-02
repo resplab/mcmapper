@@ -59,3 +59,29 @@ test_that("m and 1 - m give mirror-image parameters", {
   expect_equal(unname(hi[1]), unname(lo[2]), tolerance = 1e-3)
   expect_equal(unname(hi[2]), unname(lo[1]), tolerance = 1e-3)
 })
+
+test_that("logit-normal is reliable when m is close to 0.5", {
+  # Regression: Nelder-Mead's initial simplex scales with logit(m), which is ~0
+  # here, so optim() used to stall (returning NULL) or stop at its start point
+  # while reporting convergence (returning silently wrong parameters).
+  m <- 0.500017426890921; cc <- 0.767249881090165
+  res <- mcmap(c(m, cc), "logitnorm")$value
+  expect_equal(unname(res[2]), 1.16781, tolerance = 1e-4)
+  expect_equal(unname(mc_roundtrip(m, cc, "logitnorm")), c(m, cc), tolerance = 1e-3)
+
+  for (m in 0.5 + c(-1e-9, -1e-10, 0, 1e-10, 1e-9)) {
+    for (cc in c(0.6, 0.9)) {
+      expect_equal(unname(mc_roundtrip(m, cc, "logitnorm")), c(m, cc),
+                   tolerance = 1e-3, info = sprintf("m=0.5%+g c=%g", m - 0.5, cc))
+    }
+  }
+})
+
+test_that("logit-normal mapper warns instead of silently returning NULL", {
+  # Starve the optimiser so that every attempt fails.
+  expect_warning(
+    res <- mcmap_logitnorm(c(0.3, 0.7), optim_controls = list(method = "Nelder-Mead", control = list(maxit = 5))),
+    "Could not find logit-normal parameters"
+  )
+  expect_null(res)
+})

@@ -1,7 +1,8 @@
 ## Submission notes
 
 This is a minor update of an existing CRAN package (0.0.11 -> 0.0.12). It fixes
-a bug in `mcmap()` for named inputs, exports two distribution-mean functions
+a bug in `mcmap()` for named inputs and a convergence bug in the logit-normal
+mapper for means close to 0.5, exports two distribution-mean functions
 (`elogitnorm()`, `eprobitnorm()`), and adds a test suite. See NEWS.md for
 details.
 
